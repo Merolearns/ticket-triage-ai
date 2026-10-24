@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticket Triage AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1>Ticket Triage AI</h1>
+  <p class="tagline">Paste a support ticket. Get its category, urgency, confidence, and a suggested reply.</p>
+  <nav><a href="/">Triage a ticket</a> · <a href="/queue">Review queue ({{ queue_count }} tickets)</a></nav>
+</header>
+<main>
+  <form method="post" action="/">
+    <label for="subject">Subject</label>
+    <input id="subject" name="subject" value="{{ subject }}" required>
+    <label for="body">Ticket body</label>
+    <textarea id="body" name="body" rows="6" required>{{ body }}</textarea>
+    <div class="row">
+      <button type="submit">Triage ticket</button>
+      <button type="button" id="sample-btn">Load a sample ticket</button>
+    </div>
+  </form>
+
+  {% if result %}
+  <section class="result">
+    <h2>Triage result</h2>
+    {% if result.needs_review %}
+    <p class="review-flag">Needs human review — {{ "critical urgency" if result.urgency == "Critical" else "low classification confidence" }}.</p>
+    {% endif %}
+    <div class="badges">
+      <span class="badge category">{{ result.category }}</span>
+      <span class="badge urgency-{{ result.urgency|lower }}">{{ result.urgency }} urgency</span>
+    </div>
+    <p>Confidence: <strong>{{ (result.confidence * 100)|round|int }}%</strong></p>
+    <div class="bar"><div class="fill" style="width: {{ (result.confidence * 100)|round|int }}%"></div></div>
+    <h3>Why this result</h3>
+    <p>Matched keywords: {{ result.matched_keywords|join(", ") or "none — no category keywords matched" }}</p>
+    <p>Urgency signals: {{ result.urgency_signals|join(", ") or "none" }}</p>
+    <h3>Suggested reply</h3>
+    <pre>{{ result.draft }}</pre>
+    <p class="note">The triaged ticket has been added to the <a href="/queue">review queue</a>.</p>
+  </section>
+  {% endif %}
+</main>
+<script>
+const samples = {{ samples|tojson }};
+let sampleIndex = 0;
+document.getElementById("sample-btn").addEventListener("click", () => {
+  const ticket = samples[sampleIndex % samples.length];
+  sampleIndex += 1;
+  document.getElementById("subject").value = ticket.subject;
+  document.getElementById("body").value = ticket.body;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review queue — Ticket Triage AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+  <h1>Review queue</h1>
+  <p class="tagline">Every triaged ticket, with the ones that need a human first.</p>
+  <nav><a href="/">Triage a ticket</a> · <a href="/queue">Review queue</a></nav>
+</header>
+<main>
+  <section class="stats">
+    <div><strong>{{ counts.open }}</strong> open</div>
+    <div><strong>{{ counts.needs_review }}</strong> need review</div>
+    <div><strong>{{ counts.critical }}</strong> critical</div>
+    <div><strong>{{ counts.resolved }}</strong> resolved</div>
+  </section>
+
+  <form method="get" action="/queue" class="filters">
+    <label>Urgency
+      <select name="urgency">
+        <option value="">All</option>
+        {% for level in ["Critical", "High", "Medium", "Low"] %}
+        <option value="{{ level }}" {% if urgency == level %}selected{% endif %}>{{ level }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Category
+      <select name="category">
+        <option value="">All</option>
+        {% for item in categories %}
+        <option value="{{ item }}" {% if category == item %}selected{% endif %}>{{ item }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Status
+      <select name="status">
+        <option value="">All</option>
+        <option value="Open" {% if status == "Open" %}selected{% endif %}>Open</option>
+        <option value="Resolved" {% if status == "Resolved" %}selected{% endif %}>Resolved</option>
+      </select>
+    </label>
+    <button type="submit">Filter</button>
+    <a href="/queue">Clear</a>
+  </form>
+
+  <table>
+    <thead><tr><th>Subject</th><th>Category</th><th>Urgency</th><th>Confidence</th><th>Review</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for ticket in tickets %}
+      <tr>
+        <td>{{ ticket.subject }}</td>
+        <td>{{ ticket.category }}</td>
+        <td><span class="badge urgency-{{ ticket.urgency|lower }}">{{ ticket.urgency }}</span></td>
+        <td>{{ (ticket.confidence * 100)|round|int }}%</td>
+        <td>{{ "Yes" if ticket.needs_review else "No" }}</td>
+        <td>{{ ticket.status }}</td>
+        <td>
+          {% if ticket.status == "Open" %}
+          <form method="post" action="/queue/{{ ticket.id }}/resolve"><button type="submit">Resolve</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7">No tickets match these filters.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

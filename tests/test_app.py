@@ -58,3 +58,12 @@ def test_api_triage():
 def test_api_requires_subject_and_body():
     response = _client().post("/api/triage", json={"subject": ""})
     assert response.status_code == 400
+
+
+def test_empty_submit_shows_error():
+    client = _client()
+    before = len(app_module.QUEUE)
+    response = client.post("/", data={"subject": "", "body": ""})
+    assert response.status_code == 200
+    assert b"subject and a ticket body" in response.data
+    assert len(app_module.QUEUE) == before  # nothing triaged, nothing queued

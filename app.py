@@ -45,6 +45,7 @@ def triage_ticket(subject, body):
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
+    error = None
     subject = ""
     body = ""
     if request.method == "POST":
@@ -56,11 +57,13 @@ def index():
             QUEUE.insert(0, {"id": NEXT_ID, "status": "Open",
                              "subject": subject, "body": body, **result})
             NEXT_ID += 1
+        else:
+            error = "Add a subject and a ticket body before triaging."
     samples = []
     with open(SAMPLES_PATH, encoding="utf-8") as f:
         samples = json.load(f)
-    return render_template("index.html", result=result, subject=subject,
-                           body=body, samples=samples,
+    return render_template("index.html", result=result, error=error,
+                           subject=subject, body=body, samples=samples,
                            queue_count=len(QUEUE))
 
 

@@ -13,6 +13,9 @@
   <nav><a href="/">Triage a ticket</a> · <a href="/queue">Review queue ({{ queue_count }} tickets)</a></nav>
 </header>
 <main>
+  {% if error %}
+  <p class="error">{{ error }}</p>
+  {% endif %}
   <form method="post" action="/">
     <label for="subject">Subject</label>
     <input id="subject" name="subject" value="{{ subject }}" required>

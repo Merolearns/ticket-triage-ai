@@ -53,6 +53,14 @@ def _count(text, phrase):
     return len(re.findall(r"\b" + re.escape(phrase) + r"\b", text))
 
 
+def _negated_count(text, phrase):
+    """Occurrences of phrase directly preceded by 'not' or 'no'.
+
+    Keeps "this is not urgent" at low urgency instead of matching "urgent".
+    """
+    return len(re.findall(r"\b(?:not|no)\s+" + re.escape(phrase) + r"\b", text))
+
+
 def classify(subject, body):
     """Return a dict with category, urgency, confidence, signals, and flags."""
     text = (subject + " " + body).lower()
@@ -83,7 +91,10 @@ def classify(subject, body):
     urgency_hits = []
     urgency_score = 0
     for phrase, weight in URGENCY_SIGNALS.items():
-        if _count(text, phrase):
+        # A negated signal ("not urgent", "no rush") doesn't count: only
+        # unnegated occurrences push the urgency up.
+        hits = _count(text, phrase) - _negated_count(text, phrase)
+        if hits > 0:
             urgency_hits.append(phrase)
             urgency_score += weight
     if urgency_score >= 6:

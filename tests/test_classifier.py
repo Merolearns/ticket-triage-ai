@@ -27,6 +27,20 @@ def test_feature_request_is_never_urgent():
     assert result["urgency"] == "Low"
 
 
+def test_negated_urgency_stays_low():
+    result = classify("Plan change",
+                      "Just wondering, this is not urgent at all and there is no rush.")
+    assert result["urgency"] == "Low"
+    assert result["urgency_signals"] == []
+
+
+def test_urgency_still_counts_past_a_negation():
+    result = classify("Still broken",
+                      "Not urgent for me, but it is urgent for my whole team.")
+    assert "urgent" in result["urgency_signals"]
+    assert result["urgency"] == "Medium"
+
+
 def test_locked_out_account_ticket():
     result = classify("Locked out of my account",
                       "I am locked out and cannot log in, the password reset never arrives.")

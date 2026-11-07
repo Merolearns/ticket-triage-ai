@@ -34,6 +34,17 @@ def test_negated_urgency_stays_low():
     assert result["urgency_signals"] == []
 
 
+def test_negated_urgency_variants_stay_low():
+    for body in (
+        "This is not really urgent, take your time.",
+        "This isn't urgent at all.",
+        "Never urgent, no rush on this one.",
+    ):
+        result = classify("Question", body)
+        assert result["urgency"] == "Low"
+        assert "urgent" not in result["urgency_signals"]
+
+
 def test_urgency_still_counts_past_a_negation():
     result = classify("Still broken",
                       "Not urgent for me, but it is urgent for my whole team.")

@@ -54,11 +54,15 @@ def _count(text, phrase):
 
 
 def _negated_count(text, phrase):
-    """Occurrences of phrase directly preceded by 'not' or 'no'.
+    """Occurrences of phrase directly preceded by a negator.
 
     Keeps "this is not urgent" at low urgency instead of matching "urgent".
+    Negators are not/no/never/isn't, with "not really" allowed too
+    ("not really urgent" is still not urgent).
     """
-    return len(re.findall(r"\b(?:not|no)\s+" + re.escape(phrase) + r"\b", text))
+    return len(re.findall(
+        r"\b(?:not\s+(?:really\s+)?|no\s+|never\s+|isn'?t\s+)"
+        + re.escape(phrase) + r"\b", text))
 
 
 def classify(subject, body):

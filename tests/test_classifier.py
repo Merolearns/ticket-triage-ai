@@ -52,6 +52,22 @@ def test_urgency_still_counts_past_a_negation():
     assert result["urgency"] == "Medium"
 
 
+def test_negated_category_keyword_does_not_score():
+    # "refund" and "login" both weigh 3, so without negation this ties
+    # and Billing wins by dict order — but the writer ruled a refund out.
+    result = classify("Question",
+                      "No refund needed, just a question about my login.")
+    assert result["category"] == "Account"
+    assert result["category_scores"]["Billing"] == 0
+    assert "refund" not in result["matched_keywords"]
+
+
+def test_unnegated_category_keyword_still_scores():
+    result = classify("Refund please", "I need a refund for this charge.")
+    assert result["category"] == "Billing"
+    assert result["category_scores"]["Billing"] >= 3
+
+
 def test_locked_out_account_ticket():
     result = classify("Locked out of my account",
                       "I am locked out and cannot log in, the password reset never arrives.")

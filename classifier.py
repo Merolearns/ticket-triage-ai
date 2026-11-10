@@ -75,8 +75,10 @@ def classify(subject, body):
         total = 0
         hits = []
         for phrase, weight in keywords.items():
-            n = _count(text, phrase)
-            if n:
+            # A ruled-out keyword ("no refund needed") shouldn't score
+            # either — same negation handling as the urgency signals.
+            n = _count(text, phrase) - _negated_count(text, phrase)
+            if n > 0:
                 total += weight * n
                 hits.append(phrase)
         scores[category] = total

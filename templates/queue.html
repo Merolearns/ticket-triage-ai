@@ -13,6 +13,11 @@
   <nav><a href="/">Triage a ticket</a> · <a href="/queue">Review queue</a></nav>
 </header>
 <main>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div class="flash">{{ messages[0] }}</div>
+  {% endif %}
+  {% endwith %}
   <section class="stats">
     <div><strong>{{ counts.open }}</strong> open</div>
     <div><strong>{{ counts.needs_review }}</strong> need review</div>

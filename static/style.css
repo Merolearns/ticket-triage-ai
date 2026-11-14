@@ -36,3 +36,5 @@ table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb; }
 .error { background: #fee2e2; border-left: 4px solid #dc2626; color: #991b1b;
   padding: 0.5rem 0.75rem; border-radius: 0 6px 6px 0; }
+.flash { background: #fef3c7; border-left: 4px solid #f59e0b; color: #92400e;
+  padding: 0.5rem 0.75rem; border-radius: 0 6px 6px 0; margin-bottom: 1rem; }

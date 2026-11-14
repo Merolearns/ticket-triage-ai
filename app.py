@@ -10,12 +10,14 @@ machine and nothing is stored on disk beyond the sample fixtures.
 import json
 import os
 
-from flask import Flask, jsonify, redirect, render_template, request, url_for
+from flask import (Flask, flash, jsonify, redirect, render_template, request,
+                   url_for)
 
 from classifier import classify
 from drafts import draft_reply
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("TRIAGE_SECRET", "dev-secret-change-me")
 
 SAMPLES_PATH = os.path.join(os.path.dirname(__file__), "samples",
                              "sample_tickets.json")
@@ -99,6 +101,10 @@ def resolve(ticket_id):
         if ticket["id"] == ticket_id:
             ticket["status"] = "Resolved"
             break
+    else:
+        # Resolving a ticket that is already gone used to redirect silently,
+        # so a stale queue page looked like it had worked.
+        flash("Ticket not found.")
     return redirect(url_for("queue"))
 
 

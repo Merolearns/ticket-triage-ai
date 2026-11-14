@@ -44,6 +44,15 @@ def test_resolve_marks_ticket_resolved():
     app_module.QUEUE[0]["status"] = "Open"  # leave the queue as found
 
 
+def test_resolve_missing_ticket_says_so():
+    # A resolve for a ticket that is no longer in the queue used to
+    # redirect silently, looking like it had worked.
+    client = _client()
+    response = client.post("/queue/99999/resolve", follow_redirects=True)
+    assert response.status_code == 200
+    assert b"Ticket not found." in response.data
+
+
 def test_api_triage():
     response = _client().post("/api/triage", json={
         "subject": "App crashes on upload",

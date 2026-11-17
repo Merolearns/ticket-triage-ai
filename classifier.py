@@ -39,6 +39,11 @@ CATEGORIES = {
 URGENCY_SIGNALS = {
     "outage": 6, "down for everyone": 6, "data loss": 6, "breach": 6,
     "hacked": 6, "security": 6, "production down": 6, "all users": 6,
+    # A bare "down" ("the app is down") on its own reads Medium and reaches
+    # High with any corroborating signal; "down for everyone" still drives
+    # Critical above. It used to score nothing, so a down service triaged
+    # as Low urgency.
+    "down": 2,
     "urgent": 2, "asap": 2, "immediately": 2, "blocking": 2,
     "can't work": 2, "payment failed": 2, "locked out": 2,
     "losing money": 2, "deadline": 2, "angry": 1, "frustrated": 1,

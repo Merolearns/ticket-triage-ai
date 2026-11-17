@@ -12,6 +12,27 @@ def test_billing_ticket():
     assert result["confidence"] >= 0.5
 
 
+def test_service_down_is_not_low():
+    # A down service used to triage as Low: "down" matched no urgency signal.
+    result = classify("App is down",
+                      "The dashboard is down since this morning, nobody can get in.")
+    assert result["category"] == "Technical"
+    assert result["urgency"] == "Medium"
+    assert "down" in result["urgency_signals"]
+
+
+def test_service_down_plus_blocking_is_high():
+    result = classify("App is down",
+                      "The app is down and this is blocking my work.")
+    assert result["urgency"] == "High"
+
+
+def test_not_down_stays_low():
+    result = classify("Checking status",
+                      "Just confirming the app is not down for me.")
+    assert result["urgency"] == "Low"
+
+
 def test_outage_is_critical():
     result = classify("Whole team hit by outage",
                       "There is an outage, the service is down for everyone, urgent.")

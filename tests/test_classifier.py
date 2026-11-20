@@ -48,6 +48,16 @@ def test_feature_request_is_never_urgent():
     assert result["urgency"] == "Low"
 
 
+def test_plain_question_lists_no_urgency_signals():
+    # "question" and "how do i" used to sit in URGENCY_SIGNALS at weight 0:
+    # they added nothing to the score but still showed up as urgency
+    # signals, so a plain question looked like it carried urgency.
+    result = classify("Question about my invoice",
+                      "Just a question — how do I download my receipt?")
+    assert result["urgency"] == "Low"
+    assert result["urgency_signals"] == []
+
+
 def test_negated_urgency_stays_low():
     result = classify("Plan change",
                       "Just wondering, this is not urgent at all and there is no rush.")

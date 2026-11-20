@@ -47,8 +47,11 @@ URGENCY_SIGNALS = {
     "urgent": 2, "asap": 2, "immediately": 2, "blocking": 2,
     "can't work": 2, "payment failed": 2, "locked out": 2,
     "losing money": 2, "deadline": 2, "angry": 1, "frustrated": 1,
-    "disappointed": 1, "slow": 1, "confused": 1, "question": 0,
-    "how do i": 0,
+    "disappointed": 1, "slow": 1, "confused": 1,
+    # Question-style phrases ("question", "how do i") are deliberately not
+    # listed: at weight 0 they added nothing to the score but still showed
+    # up as urgency signals, so a plain question looked like it carried
+    # urgency.
 }
 
 REVIEW_CONFIDENCE = 0.55
